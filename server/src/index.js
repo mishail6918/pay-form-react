@@ -4,12 +4,20 @@ const bodyParser = require("body-parser"),
   { isString, getRandomRange } = require("./utils"),
   express = require("express"),
   jayson = require("jayson"),
-  app = express(),
-  uuid = require("uuid");
+  cors = require("cors");
+(app = express()), (uuid = require("uuid"));
 
 let pid = null;
 let callCount = 0;
 let randomCall = getRandomRange(2, 5);
+
+app.use(
+  cors({
+    origin: "http://localhost:3000", // Домен React-приложения
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type"],
+  })
+);
 
 const paymentSession = (args, cb) => {
   const { pan, expire, cardholder, cvc } = args,
@@ -24,7 +32,7 @@ const paymentSession = (args, cb) => {
 };
 
 const EmployeeServices = jayson.server({
-  pay: (args, cb) => (args ? paymentSession(args, cb) : cb(ErrorMSG()))
+  pay: (args, cb) => (args ? paymentSession(args, cb) : cb(ErrorMSG())),
 });
 
 app.use(bodyParser.json());
